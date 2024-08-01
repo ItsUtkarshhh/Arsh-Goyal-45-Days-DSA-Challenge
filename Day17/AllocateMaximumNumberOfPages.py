@@ -1,4 +1,4 @@
-// GFG Question :
+ # GFG Question :
 def findPages(n, arr, m):
     def canAllocate(maxPages):
         studentCount = 1
