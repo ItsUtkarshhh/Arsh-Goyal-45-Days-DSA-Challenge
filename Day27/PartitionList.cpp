@@ -2,64 +2,58 @@
 #include <iostream>
 using namespace std;
 
-// Definition for a Node.
-class Node {
-public:
+// Definition for singly-linked list.
+struct ListNode {
     int val;
-    Node* prev;
-    Node* next;
-    Node* child;
-
-    Node(int _val) {
-        val = _val;
-        prev = NULL;
-        next = NULL;
-        child = NULL;
-    }
+    ListNode *next;
+    ListNode() : val(0), next(nullptr) {}
+    ListNode(int x) : val(x), next(nullptr) {}
+    ListNode(int x, ListNode *next) : val(x), next(next) {}
 };
 
 class Solution {
 public:
-    Node* flatten(Node* head) {
-        if (!head) return head;
+    ListNode* partition(ListNode* head, int x) {
+        if (!head) return nullptr;
 
-        Node* curr = head;
-        while (curr != NULL) {
-            if (curr->child) {
-                // Step 1: Store the next node
-                Node* next = curr->next;
+        // Dummy nodes to initiate the two lists
+        ListNode* lessHead = new ListNode(0);
+        ListNode* greaterHead = new ListNode(0);
 
-                // Step 2: Flatten the child list
-                Node* child = flatten(curr->child);
+        // Pointers to the current end of the less and greater lists
+        ListNode* less = lessHead;
+        ListNode* greater = greaterHead;
 
-                // Step 3: Attach the child list to curr
-                curr->next = child;
-                child->prev = curr;
-
-                // Step 4: Find the tail of the child list
-                while (child->next != NULL) {
-                    child = child->next;
-                }
-
-                // Step 5: Connect the tail of the child list to the next node
-                child->next = next;
-                if (next != NULL) {
-                    next->prev = child;
-                }
-
-                // Step 6: Don't forget to remove the child pointer
-                curr->child = NULL;
+        // Traverse the list and partition the nodes
+        while (head != nullptr) {
+            if (head->val < x) {
+                less->next = head;
+                less = less->next;
+            } else {
+                greater->next = head;
+                greater = greater->next;
             }
-            // Move to the next node
-            curr = curr->next;
+            head = head->next;
         }
-        return head;
+
+        // Connect the two lists and terminate the last node of the greater list
+        greater->next = nullptr;
+        less->next = greaterHead->next;
+
+        // The new head is the start of the less list
+        ListNode* newHead = lessHead->next;
+
+        // Clean up the dummy nodes
+        delete lessHead;
+        delete greaterHead;
+
+        return newHead;
     }
 };
 
 // Helper function to print the list
-void printList(Node* head) {
-    while (head != NULL) {
+void printList(ListNode* head) {
+    while (head != nullptr) {
         cout << head->val << " ";
         head = head->next;
     }
@@ -68,24 +62,8 @@ void printList(Node* head) {
 
 // Example usage
 int main() {
-    // Creating the nodes
-    Node* head = new Node(1);
-    head->next = new Node(2);
-    head->next->prev = head;
-    head->next->next = new Node(3);
-    head->next->next->prev = head->next;
+    // Creating the linked list 1 -> 4 -> 3 -> 2 -> 5 -> 2
+    ListNode* head = new ListNode(1);
+    head->next = new ListNode(4);
+    head->next->
 
-    // Adding a child to the second node
-    head->next->child = new Node(7);
-    head->next->child->next = new Node(8);
-    head->next->child->next->prev = head->next->child;
-
-    // Flatten the list
-    Solution solution;
-    head = solution.flatten(head);
-
-    // Print the flattened list
-    printList(head);
-
-    return 0;
-}
